@@ -7,9 +7,9 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
-<!-- ADD ONLY -->
-<link href="https://fonts.googleapis.com/css2?family=Siyam+Rupali&display=swap" rel="stylesheet">
+
+<!-- SolaimanLipi -->
+<link href="https://cdn.jsdelivr.net/gh/mirazmac/bengali-web-fonts@master/fonts/solaimanlipi/stylesheet.css" rel="stylesheet">
 
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 <script>
@@ -41,7 +41,7 @@
     body {
         margin: 0;
         padding: 40px 20px;
-        font-family: 'Siyam Rupali', 'Inter', 'Hind Siliguri', sans-serif;
+        font-family: 'SolaimanLipi', sans-serif;
         background: var(--bg-grad);
         min-height: 100vh;
         color: var(--text-main);
@@ -98,15 +98,15 @@
         margin-bottom: 24px;
     }
 
-    @media (max-width: 600px) { .options-grid { grid-template-columns: 1fr; } }
+    @media (max-width: 600px) {
+        .options-grid { grid-template-columns: 1fr; }
+    }
 
     .option-item {
         background: #f9fafb;
         border: 2px solid var(--border);
         padding: 12px 16px;
         border-radius: 12px;
-        font-size: 1rem;
-        color: var(--text-main);
         display: flex;
         align-items: center;
     }
@@ -115,14 +115,12 @@
         width: 28px;
         height: 28px;
         background: #e5e7eb;
-        color: var(--text-muted);
         border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 0.85rem;
-        font-weight: 700;
         margin-right: 12px;
+        font-weight: 700;
     }
 
     .action-area {
@@ -143,14 +141,7 @@
         font-family: inherit;
         font-weight: 600;
         cursor: pointer;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        transition: all 0.2s;
     }
-
-    .btn-solve:hover { background: var(--primary-dark); transform: translateY(-2px); }
-    .btn-solve:disabled { background: #9ca3af; cursor: not-allowed; }
 
     .result-box {
         margin-top: 20px;
@@ -177,20 +168,13 @@
         line-height: 1.8;
     }
 
-    .loader {
-        display: inline-block;
-        width: 16px;
-        height: 16px;
-        border: 2px solid rgba(255,255,255,0.3);
-        border-radius: 50%;
-        border-top-color: #fff;
-        animation: spin 1s linear infinite;
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
     }
-
-    @keyframes spin { to { transform: rotate(360deg); } }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 </style>
 </head>
+
 <body>
 
 <header>
@@ -209,12 +193,6 @@ const GEMINI_API_KEY = "AIzaSyBSXsR-Mn4uHN2JLSR_S_uvWQFcBB-8JCA";
 const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`;
 
 /* ================= UTILS ================= */
-function stripHtml(html) {
-   let tmp = document.createElement("DIV");
-   tmp.innerHTML = html;
-   return tmp.textContent || tmp.innerText || "";
-}
-
 function showError(msg) {
     const box = document.getElementById("errorBox");
     box.style.display = "block";
@@ -226,12 +204,12 @@ async function getAIExplanation(question, options, correctAnswer) {
     
     Task: এটা জবের বিগত বছরের একট এমসিকিউ। খুব সহজে ও খুব ছোট করে ব্যাখ্যা দিবা। অতিরিক্ত কিছু চাই না। জব প্রিপারেশন বইয়ে যেভাবে থাকে সেভাবে উত্তর চাই।
     
-    Question: "${question}"
+    Question: ${question}
     Options: ${options.join(', ')}
-    Correct Answer: "${correctAnswer}"
+    Correct Answer: ${correctAnswer}
 
     Guidelines:
-    ১. প্রথমে বোল্ড করে হুবহু প্রশ্ন টি দিবা। Use LaTeX for math expressions.
+    ১. প্রথমে বোল্ড করে হুবহু প্রশ্ন টি দিবা। যদি তোমাকে কোনো Mathjax/matml কোড দেওয়া হয় সেটা আগে ম্যাথ ইকুয়েশ্ন এ রুপান্তর করে ব্যাখ্যা দিবা। Use LaTeX for math expressions.
     ২. Use bold text for the final answer.
     ৩. Output strictly in Markdown.
     `;
@@ -246,14 +224,8 @@ async function getAIExplanation(question, options, correctAnswer) {
         });
 
         const data = await response.json();
-        
-        if (data.error) {
-            console.error("API Error:", data.error);
-            return `**API Error:** ${data.error.message}`;
-        }
-
         return data.candidates?.[0]?.content?.parts?.[0]?.text || "দুঃখিত, কোনো ব্যাখ্যা পাওয়া যায়নি।";
-    } catch (error) {
+    } catch {
         return "ইন্টারনেট সংযোগে সমস্যা হচ্ছে। আবার চেষ্টা করুন।";
     }
 }
@@ -282,7 +254,7 @@ async function init() {
         card.innerHTML = `
             <span class="question-badge">প্রশ্ন ${index + 1}</span>
             <div class="question-text">${q.label}</div>
-            
+
             <div class="options-grid">
                 ${q.options.map((opt, i) => `
                     <div class="option-item">
@@ -293,9 +265,7 @@ async function init() {
             </div>
 
             <div class="action-area">
-                <button class="btn-solve">
-                    <span>উত্তর ও ব্যাখ্যা দেখুন</span>
-                </button>
+                <button class="btn-solve">উত্তর ও ব্যাখ্যা দেখুন</button>
             </div>
 
             <div class="result-box">
@@ -310,35 +280,20 @@ async function init() {
         let isLoaded = false;
 
         btn.onclick = async () => {
-            if (resultBox.style.display === "block") {
-                resultBox.style.display = "none";
-                btn.innerHTML = `<span>উত্তর ও ব্যাখ্যা দেখুন</span>`;
-                return;
-            }
-
             resultBox.style.display = "block";
-            
-            if (!isLoaded) {
-                btn.innerHTML = `<div class="loader"></div> <span>ব্যাখ্যা তৈরি হচ্ছে...</span>`;
-                btn.disabled = true;
 
+            if (!isLoaded) {
                 const markdownText = await getAIExplanation(
-                    stripHtml(q.label),
-                    q.options.map(stripHtml),
-                    stripHtml(correctAnswerText)
+                    q.label,
+                    q.options,
+                    correctAnswerText
                 );
 
                 explanationBox.innerHTML = marked.parse(markdownText);
-                
-                if (window.MathJax && window.MathJax.typesetPromise) {
-                    await MathJax.typesetPromise([explanationBox]);
+                if (window.MathJax) {
+                    MathJax.typesetPromise([explanationBox]);
                 }
-
-                btn.innerHTML = `<span>লুকান</span>`;
-                btn.disabled = false;
                 isLoaded = true;
-            } else {
-                btn.innerHTML = `<span>লুকান</span>`;
             }
         };
 
