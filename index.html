@@ -9,8 +9,8 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
 <!-- SolaimanLipi font -->
-<link href="https://cdn.jsdelivr.net/gh/mirazmac/bengali-web-fonts@master/fonts/solaimanlipi/stylesheet.css" rel="stylesheet">
-
+<link href="https://fonts.cdnfonts.com/css/solaimanlipi" rel="stylesheet">
+                
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 <script>
   window.MathJax = {
@@ -37,7 +37,13 @@
         --shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.1);
         --radius: 16px;
     }
-
+* {
+  word-break: break-word; /* Older support, works in most browsers */
+  word-break: break-all;  /* Forces break anywhere if needed */
+  overflow-wrap: break-word; /* Modern, recommended */
+  hyphens: auto; /* Optional: adds hyphenation if supported */
+font-family: 'SolaimanLipi', sans-serif;
+}
     body {
         margin: 0;
         padding: 40px 20px;
