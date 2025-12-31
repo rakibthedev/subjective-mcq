@@ -43,7 +43,7 @@
           background: var(--bg-grad);
         min-height: 100vh;
         color: var(--text-main);
-      font-family: 'Siyam Rupali', sans-serif;
+     /* font-family: 'Siyam Rupali', sans-serif;*/
     
     }
 
@@ -219,7 +219,6 @@ function showError(msg) {
 async function getAIExplanation(question, options, correctAnswer) {
     // RAW HTML passed, no stripping
     const prompt = `
-    
     Task: এটা জবের বিগত বছরের একট এমসিকিউ। খুব সহজে ও খুব ছোট করে ব্যাখ্যা দিবা। অতিরিক্ত কিছু চাই না। জব প্রিপারেশন বইয়ে যেভাবে থাকে সেভাবে উত্তর চাই.
     
     Question: "${question}"
