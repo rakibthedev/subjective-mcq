@@ -193,7 +193,7 @@
 
 <header>
     <h1>Primary Math Genius</h1>
-    <p class="subtitle">এআই প্রযুক্তির মাধ্যমে গণিত শিখুন সহজে</p>
+    <p class="subtitle">AI Powered Explanation</p>
 </header>
 
 <div class="container">
@@ -221,19 +221,17 @@ function showError(msg) {
 
 async function getAIExplanation(question, options, correctAnswer) {
     const prompt = `
-    Role: You are a friendly Primary School Math Teacher in Bangladesh.
-    Task: Explain this math problem in clear **Bengali (Bangla)** language for a child.
+    
+    Task: এটা জবের বিগত বছরের একট এমসিকিউ। খুব সহজে ও খুব ছোট করে ব্যাখ্যা দিবা। অতিরিক্ত কিছু চাই না। জব প্রিপারেশন বইয়ে যেভাবে থাকে সেভাবে উত্তর চাই।
     
     Question: "${question}"
     Options: ${options.join(', ')}
     Correct Answer: "${correctAnswer}"
 
     Guidelines:
-    1. Start with a positive encouragement like "চলো অংকটি সমাধান করি!"
-    2. Provide step-by-step reasoning.
-    3. Use LaTeX for math expressions (e.g., $5 + 5 = 10$).
-    4. Use bold text for the final answer.
-    5. Output strictly in Markdown.
+    ১. Use LaTeX for math expressions.
+    ২. Use bold text for the final answer.
+    ৩. Output strictly in Markdown.
     `;
 
     try {
