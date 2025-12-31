@@ -66,6 +66,7 @@ function mathMLToText(mathML) {
 
     function traverse(node) {
         if (!node) return "";
+
         switch (node.nodeName) {
             case "math":
             case "mrow":
@@ -80,9 +81,15 @@ function mathMLToText(mathML) {
                 const denominator = traverse(node.childNodes[1]);
                 return `(${numerator}/${denominator})`;
             case "msup":
-                const base = traverse(node.childNodes[0]);
+            case "sup": // HTML sup
+                const baseSup = traverse(node.childNodes[0]);
                 const exp = traverse(node.childNodes[1]);
-                return `(${base}^${exp})`;
+                return `(${baseSup}^${exp})`;
+            case "msub":
+            case "sub": // HTML sub
+                const baseSub = traverse(node.childNodes[0]);
+                const sub = traverse(node.childNodes[1]);
+                return `(${baseSub}_${sub})`;
             default:
                 return Array.from(node.childNodes).map(traverse).join("");
         }
@@ -96,6 +103,7 @@ function convertMathMLInText(text) {
     const mathMLRegex = /<math[\s\S]*?<\/math>/g;
     return text.replace(mathMLRegex, (match) => mathMLToText(match));
 }
+
 
 // Fetch MCQs JSON
 fetch("json/primary_math.json")
