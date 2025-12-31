@@ -14,7 +14,7 @@
 <script>
   window.MathJax = {
     tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
-    startup: { typeset: false } // We will trigger manually
+    startup: { typeset: false }
   };
 </script>
 <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
@@ -31,6 +31,8 @@
         --border: #e5e7eb;
         --success-bg: #d1fae5;
         --success-text: #065f46;
+        --error-bg: #fee2e2;
+        --error-text: #991b1b;
         --shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.1);
         --radius: 16px;
     }
@@ -44,26 +46,22 @@
         color: var(--text-main);
     }
 
-    header {
+    header { text-align: center; margin-bottom: 40px; }
+    h1 { font-size: 2rem; font-weight: 700; color: var(--primary-dark); margin: 0; }
+    p.subtitle { color: var(--text-muted); margin-top: 8px; }
+
+    .container { max-width: 800px; margin: 0 auto; }
+
+    /* Error Message Box */
+    .error-box {
+        background: var(--error-bg);
+        color: var(--error-text);
+        padding: 20px;
+        border-radius: var(--radius);
         text-align: center;
-        margin-bottom: 40px;
-    }
-
-    h1 {
-        font-size: 2rem;
-        font-weight: 700;
-        color: var(--primary-dark);
-        margin: 0;
-    }
-
-    p.subtitle {
-        color: var(--text-muted);
-        margin-top: 8px;
-    }
-
-    .container {
-        max-width: 800px;
-        margin: 0 auto;
+        border: 1px solid #fca5a5;
+        margin-bottom: 20px;
+        display: none; /* Hidden by default */
     }
 
     /* MCQ Card Styling */
@@ -74,7 +72,6 @@
         margin-bottom: 30px;
         box-shadow: var(--shadow);
         border: 1px solid rgba(255,255,255,0.5);
-        transition: transform 0.2s ease;
     }
 
     .question-badge {
@@ -102,26 +99,17 @@
         margin-bottom: 24px;
     }
 
-    @media (max-width: 600px) {
-        .options-grid { grid-template-columns: 1fr; }
-    }
+    @media (max-width: 600px) { .options-grid { grid-template-columns: 1fr; } }
 
     .option-item {
         background: #f9fafb;
         border: 2px solid var(--border);
         padding: 12px 16px;
         border-radius: 12px;
-        cursor: default;
         font-size: 1rem;
         color: var(--text-main);
-        transition: all 0.2s;
         display: flex;
         align-items: center;
-    }
-
-    .option-item:hover {
-        border-color: #c7d2fe;
-        background: #eef2ff;
     }
 
     .option-marker {
@@ -138,7 +126,6 @@
         margin-right: 12px;
     }
 
-    /* Action Area */
     .action-area {
         display: flex;
         justify-content: space-between;
@@ -163,16 +150,9 @@
         transition: background 0.2s;
     }
 
-    .btn-solve:hover {
-        background: var(--primary-dark);
-    }
+    .btn-solve:hover { background: var(--primary-dark); }
+    .btn-solve:disabled { background: #9ca3af; cursor: not-allowed; }
 
-    .btn-solve svg {
-        width: 18px;
-        height: 18px;
-    }
-
-    /* Result & Explanation */
     .result-box {
         margin-top: 20px;
         display: none;
@@ -198,17 +178,16 @@
         line-height: 1.7;
     }
 
-    /* AI Content Formatting */
-    .ai-explanation h3 { margin-top: 0; font-size: 1.1rem; color: var(--text-main); }
-    .ai-explanation strong { color: var(--primary-dark); }
-    .ai-explanation p { margin-bottom: 10px; }
-    
-    /* Loading Spinner */
+    /* Markdown Styles within Explanation */
+    .ai-explanation h3 { margin-top: 0; font-size: 1.1rem; }
+    .ai-explanation ul { padding-left: 20px; }
+    .ai-explanation li { margin-bottom: 8px; }
+
     .loader {
         display: inline-block;
-        width: 20px;
-        height: 20px;
-        border: 3px solid rgba(255,255,255,0.3);
+        width: 16px;
+        height: 16px;
+        border: 2px solid rgba(255,255,255,0.3);
         border-radius: 50%;
         border-top-color: #fff;
         animation: spin 1s ease-in-out infinite;
@@ -216,7 +195,6 @@
 
     @keyframes spin { to { transform: rotate(360deg); } }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
 </style>
 </head>
 <body>
@@ -226,40 +204,44 @@
     <p class="subtitle">AI-Powered Math Explanations</p>
 </header>
 
-<div class="container" id="mcqContainer">
-    </div>
+<div class="container">
+    <div id="errorBox" class="error-box"></div>
+    <div id="mcqContainer"></div>
+</div>
 
 <script>
 /* ================= CONFIGURATION ================= */
-// ⚠️ WARNING: Use a backend proxy for production to hide this key.
-const GEMINI_API_KEY = "AIzaSyBSXsR-Mn4uHN2JLSR_S_uvWQFcBB-8JCA"; // <--- PASTE YOUR KEY HERE
+const GEMINI_API_KEY = "YOUR_API_KEY_HERE"; // <--- আপনার API KEY এখানে বসান
 const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
 
 /* ================= UTILS ================= */
-
-// Clean text for API
 function stripHtml(html) {
    let tmp = document.createElement("DIV");
    tmp.innerHTML = html;
    return tmp.textContent || tmp.innerText || "";
 }
 
-// Function to call Gemini
+function showError(msg) {
+    const box = document.getElementById("errorBox");
+    box.style.display = "block";
+    box.innerHTML = `<strong>Error:</strong> ${msg}`;
+}
+
+// Call Gemini API
 async function getAIExplanation(question, options, correctAnswer) {
     const prompt = `
-    Role: You are a friendly and expert Primary School Math Teacher in Bangladesh.
-    Task: Explain the following math problem step-by-step in Bengali (Bangla).
+    Role: You are a friendly Primary School Math Teacher in Bangladesh.
+    Task: Explain this math problem in clear **Bengali (Bangla)** language.
     
     Question: "${question}"
     Options: ${options.join(', ')}
     Correct Answer: "${correctAnswer}"
 
     Guidelines:
-    1. Start with a direct, simple explanation.
-    2. Use bullet points for steps.
-    3. Use bold text for numbers and key formulas.
-    4. Keep the tone encouraging.
-    5. Output must be in strictly valid Markdown format.
+    1. Provide the solution step-by-step.
+    2. Use bullet points.
+    3. Be encouraging.
+    4. Output strictly in Markdown format.
     `;
 
     try {
@@ -272,45 +254,45 @@ async function getAIExplanation(question, options, correctAnswer) {
         });
 
         const data = await response.json();
-        const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
-        return text || "দুঃখিত, ব্যাখ্যাটি লোড করা যাচ্ছে না।";
+        
+        if (data.error) {
+            console.error("Gemini API Error:", data.error);
+            return `**API Error:** ${data.error.message}`;
+        }
+
+        return data.candidates?.[0]?.content?.parts?.[0]?.text || "ব্যাখ্যা পাওয়া যায়নি।";
     } catch (error) {
         console.error(error);
-        return "ইন্টারনেট সংযোগ সমস্যা। আবার চেষ্টা করুন।";
+        return "ইন্টারনেট সংযোগ সমস্যা। দয়া করে আবার চেষ্টা করুন।";
     }
 }
 
 /* ================= MAIN LOGIC ================= */
-
-// MOCK DATA for testing (Remove this if loading from JSON file)
-const mockQuestions = [
-    {
-        label: "একটি কলমের দাম ৫ টাকা হলে, ১২টি কলমের দাম কত?",
-        options: ["৫০ টাকা", "৬০ টাকা", "৫৫ টাকা", "৬৫ টাকা"],
-        answer: "b"
-    },
-    {
-        label: "১০০ এর ২৫% কত?",
-        options: ["২০", "২৫", "৩০", "৩৫"],
-        answer: "b"
-    }
-];
-
-// Initialize
 async function init() {
     const container = document.getElementById("mcqContainer");
-    
-    // 1. Fetch JSON (Uncomment below line and remove mockQuestions to use real file)
-    // const questions = await fetch("json/primary_math.json").then(res => res.json());
-    
-    const questions = mockQuestions; // Using mock data for demo
+    let questions = [];
 
+    // 1. Fetch JSON Data
+    try {
+        const res = await fetch("json/primary_math.json");
+        if (!res.ok) {
+            throw new Error(`ফাইল লোড করা যায়নি (Status: ${res.status})। আপনি কি Live Server ব্যবহার করছেন?`);
+        }
+        questions = await res.json();
+    } catch (err) {
+        showError(`JSON ফাইল লোড হয়নি।<br><small>${err.message}</small><br>
+        <small style="color:black">টিপস: VS Code এ 'Open with Live Server' ব্যবহার করুন।</small>`);
+        return;
+    }
+
+    // 2. Render Cards
     questions.forEach((q, index) => {
-        // Create Card
         const card = document.createElement("div");
         card.className = "mcq-card";
 
-        // HTML Structure
+        const correctIndex = q.answer.charCodeAt(0) - 97;
+        const correctAnswerText = q.options[correctIndex];
+
         card.innerHTML = `
             <span class="question-badge">প্রশ্ন ${index + 1}</span>
             <div class="question-text">${q.label}</div>
@@ -331,19 +313,17 @@ async function init() {
             </div>
 
             <div class="result-box">
-                <div class="correct-answer">✅ সঠিক উত্তর: ${q.options[q.answer.charCodeAt(0) - 97]}</div>
+                <div class="correct-answer">✅ সঠিক উত্তর: ${correctAnswerText}</div>
                 <div class="ai-explanation"></div>
             </div>
         `;
 
-        // Logic Bindings
         const btn = card.querySelector(".btn-solve");
         const resultBox = card.querySelector(".result-box");
         const explanationBox = card.querySelector(".ai-explanation");
         let isLoaded = false;
 
         btn.onclick = async () => {
-            // Toggle Logic
             if (resultBox.style.display === "block") {
                 resultBox.style.display = "none";
                 btn.innerHTML = `<span>উত্তর ও ব্যাখ্যা দেখুন</span>`;
@@ -353,24 +333,18 @@ async function init() {
             resultBox.style.display = "block";
             
             if (!isLoaded) {
-                // Loading State
                 btn.innerHTML = `<div class="loader"></div> <span>ব্যাখ্যা তৈরি হচ্ছে...</span>`;
                 btn.disabled = true;
 
-                // 1. Get Explanation from AI
-                const correctOptIndex = q.answer.charCodeAt(0) - 97;
-                const correctAnswerText = q.options[correctOptIndex];
-                
+                // Call AI
                 const markdownText = await getAIExplanation(
                     stripHtml(q.label),
                     q.options.map(stripHtml),
                     stripHtml(correctAnswerText)
                 );
 
-                // 2. Parse Markdown to HTML using 'marked' library
+                // Render Markdown & Math
                 explanationBox.innerHTML = marked.parse(markdownText);
-
-                // 3. Render Math (MathJax) inside the new content
                 MathJax.typesetPromise([explanationBox]).then(() => {
                     btn.innerHTML = `<span>লুকান</span>`;
                     btn.disabled = false;
@@ -383,16 +357,11 @@ async function init() {
 
         container.appendChild(card);
     });
-
-    // Initial Math Render for static content
-    MathJax.typesetPromise();
 }
 
-// Run
+// Start
 init();
-
 </script>
 
 </body>
-</html>
-            
+  </html>
