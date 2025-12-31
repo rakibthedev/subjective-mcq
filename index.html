@@ -38,11 +38,7 @@
         --radius: 16px;
     }
 * {
-  word-break: break-word; /* Older support, works in most browsers */
-  word-break: break-all;  /* Forces break anywhere if needed */
-  overflow-wrap: break-word; /* Modern, recommended */
-  hyphens: auto; /* Optional: adds hyphenation if supported */
-font-family: 'SolaimanLipi', sans-serif;
+  font-family: 'SolaimanLipi', sans-serif;
 }
     body {
         margin: 0;
@@ -51,6 +47,7 @@ font-family: 'SolaimanLipi', sans-serif;
         background: var(--bg-grad);
         min-height: 100vh;
         color: var(--text-main);
+      font-size: 14px;
     }
 
     header { text-align: center; margin-bottom: 40px; }
@@ -78,6 +75,7 @@ font-family: 'SolaimanLipi', sans-serif;
         box-shadow: var(--shadow);
         border: 1px solid rgba(255,255,255,0.5);
     }
+  math {font-family: unset !important}
 
     .question-badge {
         display: inline-block;
@@ -116,7 +114,7 @@ font-family: 'SolaimanLipi', sans-serif;
         display: flex;
         align-items: center;
     }
-
+img{display: block}
     .option-marker {
         width: 28px;
         height: 28px;
