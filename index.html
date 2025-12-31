@@ -3,217 +3,396 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>All Primary Math MCQs (upto 2025)</title>
+<title>Primary Math Master</title>
 
-<!-- MathJax -->
-<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
 
-<style>
-:root {
-    --primary: #4f46e5;
-    --success: #16a34a;
-    --bg: #f8fafc;
-    --card: #ffffff;
-    --border: #e5e7eb;
-    --radius: 16px;
-    --shadow: 0 14px 40px rgba(0,0,0,.08);
-}
-
-body {
-    padding: 40px 16px;
-    font-family: system-ui, sans-serif;
-    background: linear-gradient(180deg, #f8fafc, #eef2ff);
-}
-
-h2 {
-    text-align: center;
-    margin-bottom: 30px;
-}
-
-.mcq {
-    max-width: 900px;
-    margin: 0 auto 24px;
-    background: var(--card);
-    border-radius: var(--radius);
-    padding: 22px 26px;
-    box-shadow: var(--shadow);
-}
-
-.question {
-    font-weight: 600;
-    color: var(--primary);
-    margin-bottom: 14px;
-    cursor: pointer;
-}
-
-.options li {
-    list-style: none;
-    padding: 10px;
-    margin-bottom: 8px;
-    border: 1px solid var(--border);
-    border-radius: 10px;
-}
-
-button {
-    margin-top: 10px;
-    background: linear-gradient(135deg, #4f46e5, #6366f1);
-    color: #fff;
-    border: none;
-    padding: 10px 18px;
-    border-radius: 999px;
-    cursor: pointer;
-}
-
-.answer {
-    display: none;
-    margin-top: 14px;
-    padding: 12px;
-    background: #ecfdf5;
-    color: var(--success);
-    border-radius: 12px;
-    font-weight: 600;
-}
-
-.explanation {
-    margin-top: 10px;
-    padding: 14px;
-    background: #f1f5f9;
-    border-radius: 12px;
-    font-size: 15px;
-    display: none;
-}
-
-.loading {
-    color: #64748b;
-    font-style: italic;
-}
-</style>
-</head>
-
-<body>
-
-<h2>All Primary Math MCQs (upto 2025)</h2>
-<div id="mcqContainer"></div>
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
 <script>
-/* ================= CONFIG ================= */
-const GEMINI_API_KEY = "YOUR_GEMINI_API_KEY_AIzaSyDvKAMvIAaungoUjv00SiAm_rcDAPNgAds"; // 🔑 ADD KEY
-const GEMINI_URL =
-`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
-/* ========================================= */
+  window.MathJax = {
+    tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+    startup: { typeset: false } // We will trigger manually
+  };
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 
-// Convert MathML to text for prompt
-function stripMath(text) {
-    return text.replace(/<[^>]+>/g, "");
+<style>
+    :root {
+        --primary: #6366f1;
+        --primary-dark: #4f46e5;
+        --accent: #ec4899;
+        --bg-grad: linear-gradient(135deg, #f3f4f6 0%, #e0e7ff 100%);
+        --card-bg: #ffffff;
+        --text-main: #1f2937;
+        --text-muted: #6b7280;
+        --border: #e5e7eb;
+        --success-bg: #d1fae5;
+        --success-text: #065f46;
+        --shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.1);
+        --radius: 16px;
+    }
+
+    body {
+        margin: 0;
+        padding: 40px 20px;
+        font-family: 'Inter', 'Hind Siliguri', sans-serif;
+        background: var(--bg-grad);
+        min-height: 100vh;
+        color: var(--text-main);
+    }
+
+    header {
+        text-align: center;
+        margin-bottom: 40px;
+    }
+
+    h1 {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--primary-dark);
+        margin: 0;
+    }
+
+    p.subtitle {
+        color: var(--text-muted);
+        margin-top: 8px;
+    }
+
+    .container {
+        max-width: 800px;
+        margin: 0 auto;
+    }
+
+    /* MCQ Card Styling */
+    .mcq-card {
+        background: var(--card-bg);
+        border-radius: var(--radius);
+        padding: 30px;
+        margin-bottom: 30px;
+        box-shadow: var(--shadow);
+        border: 1px solid rgba(255,255,255,0.5);
+        transition: transform 0.2s ease;
+    }
+
+    .question-badge {
+        display: inline-block;
+        background: #eef2ff;
+        color: var(--primary);
+        padding: 4px 12px;
+        border-radius: 99px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        margin-bottom: 12px;
+    }
+
+    .question-text {
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin-bottom: 20px;
+        line-height: 1.6;
+    }
+
+    .options-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        margin-bottom: 24px;
+    }
+
+    @media (max-width: 600px) {
+        .options-grid { grid-template-columns: 1fr; }
+    }
+
+    .option-item {
+        background: #f9fafb;
+        border: 2px solid var(--border);
+        padding: 12px 16px;
+        border-radius: 12px;
+        cursor: default;
+        font-size: 1rem;
+        color: var(--text-main);
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+    }
+
+    .option-item:hover {
+        border-color: #c7d2fe;
+        background: #eef2ff;
+    }
+
+    .option-marker {
+        width: 28px;
+        height: 28px;
+        background: #e5e7eb;
+        color: var(--text-muted);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.85rem;
+        font-weight: 700;
+        margin-right: 12px;
+    }
+
+    /* Action Area */
+    .action-area {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 20px;
+        border-top: 1px solid var(--border);
+        padding-top: 20px;
+    }
+
+    .btn-solve {
+        background: var(--primary);
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 12px;
+        font-family: inherit;
+        font-weight: 600;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: background 0.2s;
+    }
+
+    .btn-solve:hover {
+        background: var(--primary-dark);
+    }
+
+    .btn-solve svg {
+        width: 18px;
+        height: 18px;
+    }
+
+    /* Result & Explanation */
+    .result-box {
+        margin-top: 20px;
+        display: none;
+        animation: fadeIn 0.4s ease;
+    }
+
+    .correct-answer {
+        background: var(--success-bg);
+        color: var(--success-text);
+        padding: 12px 16px;
+        border-radius: 10px;
+        font-weight: 600;
+        display: inline-block;
+        margin-bottom: 16px;
+    }
+
+    .ai-explanation {
+        background: #f8fafc;
+        border-left: 4px solid var(--accent);
+        padding: 20px;
+        border-radius: 0 12px 12px 0;
+        font-size: 0.95rem;
+        line-height: 1.7;
+    }
+
+    /* AI Content Formatting */
+    .ai-explanation h3 { margin-top: 0; font-size: 1.1rem; color: var(--text-main); }
+    .ai-explanation strong { color: var(--primary-dark); }
+    .ai-explanation p { margin-bottom: 10px; }
+    
+    /* Loading Spinner */
+    .loader {
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        border: 3px solid rgba(255,255,255,0.3);
+        border-radius: 50%;
+        border-top-color: #fff;
+        animation: spin 1s ease-in-out infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+</style>
+</head>
+<body>
+
+<header>
+    <h1>Primary Math Genius</h1>
+    <p class="subtitle">AI-Powered Math Explanations</p>
+</header>
+
+<div class="container" id="mcqContainer">
+    </div>
+
+<script>
+/* ================= CONFIGURATION ================= */
+// ⚠️ WARNING: Use a backend proxy for production to hide this key.
+const GEMINI_API_KEY = "AIzaSyBSXsR-Mn4uHN2JLSR_S_uvWQFcBB-8JCA"; // <--- PASTE YOUR KEY HERE
+const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
+
+/* ================= UTILS ================= */
+
+// Clean text for API
+function stripHtml(html) {
+   let tmp = document.createElement("DIV");
+   tmp.innerHTML = html;
+   return tmp.textContent || tmp.innerText || "";
 }
 
-// Call Gemini API
-async function getExplanation(question, options, answer) {
+// Function to call Gemini
+async function getAIExplanation(question, options, correctAnswer) {
     const prompt = `
-তুমি একজন প্রাইমারি গণিত শিক্ষক।
+    Role: You are a friendly and expert Primary School Math Teacher in Bangladesh.
+    Task: Explain the following math problem step-by-step in Bengali (Bangla).
+    
+    Question: "${question}"
+    Options: ${options.join(', ')}
+    Correct Answer: "${correctAnswer}"
 
-প্রশ্ন:
-${question}
+    Guidelines:
+    1. Start with a direct, simple explanation.
+    2. Use bullet points for steps.
+    3. Use bold text for numbers and key formulas.
+    4. Keep the tone encouraging.
+    5. Output must be in strictly valid Markdown format.
+    `;
 
-অপশন:
-ক) ${options[0]}
-খ) ${options[1]}
-গ) ${options[2]}
-ঘ) ${options[3]}
-
-সঠিক উত্তর: ${answer}
-
-এই প্রশ্নটি ধাপে ধাপে সহজ বাংলায় ব্যাখ্যা করো যেন প্রাইমারি ছাত্র বুঝতে পারে।
-`;
-
-    const res = await fetch(GEMINI_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-            contents: [{ parts: [{ text: prompt }] }]
-        })
-    });
-
-    const data = await res.json();
-    return data.candidates?.[0]?.content?.parts?.[0]?.text || "ব্যাখ্যা পাওয়া যায়নি।";
-}
-
-// Load MCQs
-fetch("json/primary_math.json")
-.then(res => res.json())
-.then(questions => {
-    const container = document.getElementById("mcqContainer");
-
-    questions.forEach((q, index) => {
-        const mcq = document.createElement("div");
-        mcq.className = "mcq";
-
-        const question = document.createElement("div");
-        question.className = "question";
-        question.innerHTML = `Q${index + 1}. ${q.label}`;
-
-        const ul = document.createElement("ul");
-        ul.className = "options";
-
-        q.options.forEach((opt, i) => {
-            const li = document.createElement("li");
-            li.innerHTML = `${String.fromCharCode(97 + i)}. ${opt}`;
-            ul.appendChild(li);
+    try {
+        const response = await fetch(GEMINI_URL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                contents: [{ parts: [{ text: prompt }] }]
+            })
         });
 
-        const answerBox = document.createElement("div");
-        answerBox.className = "answer";
+        const data = await response.json();
+        const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+        return text || "দুঃখিত, ব্যাখ্যাটি লোড করা যাচ্ছে না।";
+    } catch (error) {
+        console.error(error);
+        return "ইন্টারনেট সংযোগ সমস্যা। আবার চেষ্টা করুন।";
+    }
+}
 
-        const explanationBox = document.createElement("div");
-        explanationBox.className = "explanation";
+/* ================= MAIN LOGIC ================= */
 
-        const correctIndex = q.answer.charCodeAt(0) - 97;
-        const correctAnswer = q.options[correctIndex];
+// MOCK DATA for testing (Remove this if loading from JSON file)
+const mockQuestions = [
+    {
+        label: "একটি কলমের দাম ৫ টাকা হলে, ১২টি কলমের দাম কত?",
+        options: ["৫০ টাকা", "৬০ টাকা", "৫৫ টাকা", "৬৫ টাকা"],
+        answer: "b"
+    },
+    {
+        label: "১০০ এর ২৫% কত?",
+        options: ["২০", "২৫", "৩০", "৩৫"],
+        answer: "b"
+    }
+];
 
-        answerBox.innerHTML = `সঠিক উত্তর: ${correctAnswer}`;
+// Initialize
+async function init() {
+    const container = document.getElementById("mcqContainer");
+    
+    // 1. Fetch JSON (Uncomment below line and remove mockQuestions to use real file)
+    // const questions = await fetch("json/primary_math.json").then(res => res.json());
+    
+    const questions = mockQuestions; // Using mock data for demo
 
-        const btn = document.createElement("button");
-        btn.textContent = "Show Answer";
+    questions.forEach((q, index) => {
+        // Create Card
+        const card = document.createElement("div");
+        card.className = "mcq-card";
 
-        let loaded = false;
+        // HTML Structure
+        card.innerHTML = `
+            <span class="question-badge">প্রশ্ন ${index + 1}</span>
+            <div class="question-text">${q.label}</div>
+            
+            <div class="options-grid">
+                ${q.options.map((opt, i) => `
+                    <div class="option-item">
+                        <span class="option-marker">${String.fromCharCode(65 + i)}</span>
+                        ${opt}
+                    </div>
+                `).join('')}
+            </div>
+
+            <div class="action-area">
+                <button class="btn-solve">
+                    <span>উত্তর ও ব্যাখ্যা দেখুন</span>
+                </button>
+            </div>
+
+            <div class="result-box">
+                <div class="correct-answer">✅ সঠিক উত্তর: ${q.options[q.answer.charCodeAt(0) - 97]}</div>
+                <div class="ai-explanation"></div>
+            </div>
+        `;
+
+        // Logic Bindings
+        const btn = card.querySelector(".btn-solve");
+        const resultBox = card.querySelector(".result-box");
+        const explanationBox = card.querySelector(".ai-explanation");
+        let isLoaded = false;
 
         btn.onclick = async () => {
-            const visible = answerBox.style.display === "block";
-
-            if (visible) {
-                answerBox.style.display = "none";
-                explanationBox.style.display = "none";
-                btn.textContent = "Show Answer";
+            // Toggle Logic
+            if (resultBox.style.display === "block") {
+                resultBox.style.display = "none";
+                btn.innerHTML = `<span>উত্তর ও ব্যাখ্যা দেখুন</span>`;
                 return;
             }
 
-            answerBox.style.display = "block";
-            btn.textContent = "Hide Answer";
+            resultBox.style.display = "block";
+            
+            if (!isLoaded) {
+                // Loading State
+                btn.innerHTML = `<div class="loader"></div> <span>ব্যাখ্যা তৈরি হচ্ছে...</span>`;
+                btn.disabled = true;
 
-            if (!loaded) {
-                explanationBox.style.display = "block";
-                explanationBox.innerHTML = `<span class="loading">ব্যাখ্যা লোড হচ্ছে...</span>`;
-
-                const explanation = await getExplanation(
-                    stripMath(q.label),
-                    q.options.map(stripMath),
-                    stripMath(correctAnswer)
+                // 1. Get Explanation from AI
+                const correctOptIndex = q.answer.charCodeAt(0) - 97;
+                const correctAnswerText = q.options[correctOptIndex];
+                
+                const markdownText = await getAIExplanation(
+                    stripHtml(q.label),
+                    q.options.map(stripHtml),
+                    stripHtml(correctAnswerText)
                 );
 
-                explanationBox.innerHTML = `<strong>ব্যাখ্যা:</strong><br>${explanation}`;
-                loaded = true;
+                // 2. Parse Markdown to HTML using 'marked' library
+                explanationBox.innerHTML = marked.parse(markdownText);
+
+                // 3. Render Math (MathJax) inside the new content
+                MathJax.typesetPromise([explanationBox]).then(() => {
+                    btn.innerHTML = `<span>লুকান</span>`;
+                    btn.disabled = false;
+                    isLoaded = true;
+                });
             } else {
-                explanationBox.style.display = "block";
+                btn.innerHTML = `<span>লুকান</span>`;
             }
         };
 
-        mcq.append(question, ul, btn, answerBox, explanationBox);
-        container.appendChild(mcq);
-
-        MathJax.typesetPromise([mcq]);
+        container.appendChild(card);
     });
-});
+
+    // Initial Math Render for static content
+    MathJax.typesetPromise();
+}
+
+// Run
+init();
+
 </script>
 
 </body>
 </html>
+            
