@@ -8,6 +8,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+<!-- ADD ONLY -->
+<link href="https://fonts.googleapis.com/css2?family=Siyam+Rupali&display=swap" rel="stylesheet">
 
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 <script>
@@ -39,7 +41,7 @@
     body {
         margin: 0;
         padding: 40px 20px;
-        font-family: 'Inter', 'Hind Siliguri', sans-serif;
+        font-family: 'Siyam Rupali', 'Inter', 'Hind Siliguri', sans-serif;
         background: var(--bg-grad);
         min-height: 100vh;
         color: var(--text-main);
@@ -259,32 +261,16 @@ async function getAIExplanation(question, options, correctAnswer) {
 /* ================= MAIN LOGIC ================= */
 async function init() {
     const container = document.getElementById("mcqContainer");
-    
-    // Demo data for testing (Replace with your actual JSON fetch if needed)
-    const questions = [
-        {
-            label: "একটি বাগানে ১২টি লাল ফুল এবং ৮টি হলুদ ফুল আছে। মোট ফুলের সংখ্যা কত?",
-            options: ["১৮টি", "২০টি", "২২টি", "২৫টি"],
-            answer: "b"
-        },
-        {
-            label: "৫ জন মানুষের প্রত্যেককে ৩টি করে আপেল দিলে মোট কতটি আপেল লাগবে?",
-            options: ["৮টি", "১০টি", "১৫টি", "১২টি"],
-            answer: "c"
-        }
-    ];
+    let questions = [];
 
-    // Note: To use external JSON, uncomment the block below and ensure you use a Live Server
-    /*
     try {
         const res = await fetch("json/primary_math.json");
         if (!res.ok) throw new Error("JSON ফাইল পাওয়া যায়নি");
         questions = await res.json();
     } catch (err) {
         showError(err.message);
-        // return; // Don't stop if demo data exists
+        return;
     }
-    */
 
     questions.forEach((q, index) => {
         const card = document.createElement("div");
@@ -344,7 +330,6 @@ async function init() {
 
                 explanationBox.innerHTML = marked.parse(markdownText);
                 
-                // Re-render MathJax for the new content
                 if (window.MathJax && window.MathJax.typesetPromise) {
                     await MathJax.typesetPromise([explanationBox]);
                 }
@@ -365,4 +350,4 @@ init();
 </script>
 
 </body>
-  </html>
+</html>
