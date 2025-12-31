@@ -227,8 +227,10 @@ async function getAIExplanation(question, options, correctAnswer) {
 
     Guidelines:
     ১. প্রথমে বোল্ড করে হুবহু প্রশ্ন টি দিবা। যদি তোমাকে কোনো Mathjax/matml কোড দেওয়া হয় সেটা আগে ম্যাথ ইকুয়েশ্ন এ রুপান্তর করে ব্যাখ্যা দিবা। Use LaTeX for math expressions.
-    ২. Use bold text for the final answer.
-    ৩. Output strictly in Markdown.
+    ২. ম্যাথ এর প্রতিটি লাইন একটার নিচে আরেটি বসাবা।
+    ৩. bold text for the final answer.
+    ৪. Output strictly in Markdown.
+    ৫. ম্যাথ ছাড়া অন্য টপিক হলে প্রশ্নটি সম্পর্কে খুব গুরুত্বপূর্ণ তথ্য সংক্ষিপ্ত আকারা দিবা।
     `;
 
     try {
